@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 export default function App() {
-  const [defaultCompanies, setDefaultCompanies] = useState<string[]>([]);
+  const [defaultCompanies, setDefaultCompanies] = useState<string[]>([
+    '삼성물산', '현대건설', '대우건설', '현대엔지니어링', '지에스건설',
+    '디엘이앤씨', '포스코이앤씨', '롯데건설', '에스케이에코플랜트', '에이치디씨현대산업개발',
+    '한화', '호반건설', '제일건설', '대방건설', '중흥토건',
+    '태영건설', '금호건설', '계룡건설산업', '서희건설', '코오롱글로벌'
+  ]);
   const [customCompanies, setCustomCompanies] = useState<Record<string, string>>(() => {
     try {
       const saved = localStorage.getItem('custom_companies');
@@ -148,8 +153,8 @@ export default function App() {
     <div className="flex bg-[#F1F5F9] min-h-screen text-on-background font-sans relative overflow-x-hidden text-body-md">
       {/* Sidebar Navigation */}
       <aside className="flex flex-col h-screen fixed left-0 top-0 w-sidebar-width z-40 bg-primary shadow-md">
-        <div className="py-gutter px-4 flex flex-col items-center">
-          <h1 className="text-[16px] font-bold text-on-primary/90 text-center tracking-wide leading-tight mt-6 mb-2">
+        <div className="py-gutter px-2 flex flex-col items-center">
+          <h1 className="text-[22px] font-bold text-on-primary text-center tracking-wide leading-tight mt-6 mb-2 whitespace-nowrap">
             주요 건설사 수주 현황
           </h1>
         </div>
@@ -306,7 +311,7 @@ export default function App() {
             </div>
 
             {/* Quick Stats Cards */}
-            <div className="col-span-12 md:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <div className="col-span-12 md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-gutter">
               <div className="bg-white p-card-padding rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between">
                 <p className="text-xs font-bold text-on-surface-variant mb-2">모니터링 건설사</p>
                 <div className="flex items-center justify-between">
@@ -323,16 +328,6 @@ export default function App() {
                   <span className="text-4xl font-extrabold text-on-surface">{history.length}</span>
                   <span className="p-2 bg-secondary-container rounded-lg text-secondary">
                     <span className="material-symbols-outlined text-[22px]">description</span>
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-white p-card-padding rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between">
-                <p className="text-xs font-bold text-on-surface-variant mb-2">시스템 버전</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-4xl font-extrabold text-secondary">1.0.0</span>
-                  <span className="p-2 bg-surface-container rounded-lg text-secondary">
-                    <span className="material-symbols-outlined text-[22px]">verified</span>
                   </span>
                 </div>
               </div>
