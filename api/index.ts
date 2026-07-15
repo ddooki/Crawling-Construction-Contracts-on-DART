@@ -72,10 +72,15 @@ app.post("/api/send-report", express.json(), async (req, res) => {
   // Forward to GAS Webhook if configured
   if (process.env.GAS_WEBHOOK_URL) {
     try {
+      const clientIp = (req.headers["x-forwarded-for"] as string || req.socket.remoteAddress || "").split(",")[0].trim();
+      const userAgent = req.headers["user-agent"] || "";
       await axios.post(process.env.GAS_WEBHOOK_URL, {
+        action: "send-report",
         email,
         company: company || "전체",
-        disclosures
+        disclosures,
+        ip: clientIp,
+        userAgent: userAgent
       }, {
         headers: {
           'Content-Type': 'application/json'
@@ -138,6 +143,27 @@ const corpCodeMap: Record<string, string> = {
 
 app.get("/api/companies", (req, res) => {
   res.json(TARGET_COMPANIES);
+});
+
+app.get("/api/api-count", async (req, res) => {
+  let globalCount = 0;
+  if (process.env.GAS_WEBHOOK_URL) {
+    const clientIp = (req.headers["x-forwarded-for"] as string || req.socket.remoteAddress || "").split(",")[0].trim();
+    const userAgent = req.headers["user-agent"] || "";
+    try {
+      const gasRes = await axios.post(process.env.GAS_WEBHOOK_URL, {
+        action: "get-api-count",
+        ip: clientIp,
+        userAgent: userAgent
+      });
+      if (gasRes.data && gasRes.data.success) {
+        globalCount = gasRes.data.count;
+      }
+    } catch (e: any) {
+      console.error("Failed to fetch call count from GAS:", e.message);
+    }
+  }
+  res.json({ count: globalCount });
 });
 
 app.get("/api/check-key", (req, res) => {
@@ -274,9 +300,31 @@ app.get("/api/disclosures", async (req, res) => {
   }
 
   results.sort((a, b) => b.date.localeCompare(a.date));
+
+  // Sync with GAS Webhook for global daily count tracking
+  let finalGlobalCount = apiCallCount;
+  if (process.env.GAS_WEBHOOK_URL && apiCallCount > 0) {
+    const clientIp = (req.headers["x-forwarded-for"] as string || req.socket.remoteAddress || "").split(",")[0].trim();
+    const userAgent = req.headers["user-agent"] || "";
+    try {
+      const gasRes = await axios.post(process.env.GAS_WEBHOOK_URL, {
+        action: "increment-api-count",
+        addedCalls: apiCallCount,
+        ip: clientIp,
+        userAgent: userAgent,
+        company: company || "전체"
+      });
+      if (gasRes.data && gasRes.data.success) {
+        finalGlobalCount = gasRes.data.count;
+      }
+    } catch (e: any) {
+      console.error("Failed to sync call count with GAS:", e.message);
+    }
+  }
+
   res.json({
     results,
-    apiCallCount
+    apiCallCount: finalGlobalCount
   });
 });
 

@@ -56,19 +56,7 @@ export default function App() {
 
   const [disclosures, setDisclosures] = useState<any[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [todayApiCallCount, setTodayApiCallCount] = useState<number>(() => {
-    try {
-      const todayStr = new Date().toLocaleDateString('sv-SE');
-      const saved = localStorage.getItem('dart_api_call_count');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.date === todayStr) {
-          return parsed.count || 0;
-        }
-      }
-    } catch {}
-    return 0;
-  });
+  const [todayApiCallCount, setTodayApiCallCount] = useState<number>(0);
   const [history, setHistory] = useState<any[]>([]);
   const [status, setStatus] = useState<any>({});
   
@@ -122,24 +110,7 @@ export default function App() {
       const list = Array.isArray(data) ? data : (data.results || []);
       const newCalls = data.apiCallCount || 0;
       setDisclosures(list);
-      
-      const todayStr = new Date().toLocaleDateString('sv-SE');
-      let storedTotal = 0;
-      try {
-        const saved = localStorage.getItem('dart_api_call_count');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.date === todayStr) {
-            storedTotal = parsed.count || 0;
-          }
-        }
-      } catch {}
-      
-      const updatedTotal = storedTotal + newCalls;
-      try {
-        localStorage.setItem('dart_api_call_count', JSON.stringify({ date: todayStr, count: updatedTotal }));
-      } catch {}
-      setTodayApiCallCount(updatedTotal);
+      setTodayApiCallCount(newCalls);
     } catch (err: any) {
       console.error("API Error:", err);
       setApiError(err.message || '오픈 API 연동에 실패했습니다.');
@@ -175,6 +146,11 @@ export default function App() {
     fetch('/api/companies')
       .then(res => res.json())
       .then(setDefaultCompanies)
+      .catch(console.error);
+
+    fetch('/api/api-count')
+      .then(res => res.json())
+      .then(data => setTodayApiCallCount(data.count || 0))
       .catch(console.error);
 
     fetchHistory();
