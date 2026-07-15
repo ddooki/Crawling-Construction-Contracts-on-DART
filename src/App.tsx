@@ -56,6 +56,19 @@ export default function App() {
 
   const [disclosures, setDisclosures] = useState<any[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [todayApiCallCount, setTodayApiCallCount] = useState<number>(() => {
+    try {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const saved = localStorage.getItem('dart_api_call_count');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.date === todayStr) {
+          return parsed.count || 0;
+        }
+      }
+    } catch {}
+    return 0;
+  });
   const [history, setHistory] = useState<any[]>([]);
   const [status, setStatus] = useState<any>({});
   
@@ -106,7 +119,27 @@ export default function App() {
         throw new Error(errorData.error || 'DART API 연동 중 오류가 발생했습니다.');
       }
       const data = await res.json();
-      setDisclosures(data);
+      const list = Array.isArray(data) ? data : (data.results || []);
+      const newCalls = data.apiCallCount || 0;
+      setDisclosures(list);
+      
+      const todayStr = new Date().toISOString().split('T')[0];
+      let storedTotal = 0;
+      try {
+        const saved = localStorage.getItem('dart_api_call_count');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.date === todayStr) {
+            storedTotal = parsed.count || 0;
+          }
+        }
+      } catch {}
+      
+      const updatedTotal = storedTotal + newCalls;
+      try {
+        localStorage.setItem('dart_api_call_count', JSON.stringify({ date: todayStr, count: updatedTotal }));
+      } catch {}
+      setTodayApiCallCount(updatedTotal);
     } catch (err: any) {
       console.error("API Error:", err);
       setApiError(err.message || '오픈 API 연동에 실패했습니다.');
@@ -300,6 +333,9 @@ export default function App() {
                 </span>
                 <span className="text-xs text-on-surface-variant">
                   | 필터: <strong className="text-secondary font-bold">{selectedCompany || '전체 건설사'}</strong>
+                </span>
+                <span className="text-xs text-on-surface-variant bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  오늘 DART API 호출: <strong className="text-primary font-extrabold">{todayApiCallCount}회</strong> / 40,000회
                 </span>
               </div>
             </div>

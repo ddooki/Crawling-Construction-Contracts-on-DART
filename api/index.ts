@@ -185,10 +185,12 @@ app.get("/api/disclosures", async (req, res) => {
   }
 
   let results: any[] = [];
+  let apiCallCount = 0;
   
   try {
     const listPromises = targetCorpCodes.map(async (target) => {
       try {
+        apiCallCount++;
         const listRes = await fetchDartAPI("https://opendart.fss.or.kr/api/list.json", {
           params: { crtfc_key: apiKey, corp_code: target.code, bgn_de: formattedStart, end_de: formattedEnd, page_count: 100 }
         });
@@ -218,6 +220,7 @@ app.get("/api/disclosures", async (req, res) => {
         let title = item.report_nm || "단일판매·공급계약체결"; 
         
         try {
+          apiCallCount++;
           const docRes = await fetchDartAPI("https://opendart.fss.or.kr/api/document.xml", {
             params: { crtfc_key: apiKey, rcept_no: item.rcept_no },
             responseType: 'arraybuffer'
@@ -271,7 +274,10 @@ app.get("/api/disclosures", async (req, res) => {
   }
 
   results.sort((a, b) => b.date.localeCompare(a.date));
-  res.json(results);
+  res.json({
+    results,
+    apiCallCount
+  });
 });
 
 export default app;
