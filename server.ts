@@ -1,10 +1,13 @@
 import express from "express";
 import path from "path";
 import axios from "axios";
-import admZip from "adm-zip";
-import { parseStringPromise } from "xml2js";
 import dotenv from "dotenv";
 import https from "https";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const AdmZip = require("adm-zip");
+const { parseStringPromise } = require("xml2js");
 
 dotenv.config();
 
@@ -238,7 +241,7 @@ app.get("/api/disclosures", async (req, res) => {
             params: { crtfc_key: apiKey, rcept_no: item.rcept_no },
             responseType: 'arraybuffer'
           });
-          const zip = new admZip(docRes.data);
+          const zip = new AdmZip(docRes.data);
           const xmlEntry = zip.getEntries()[0];
           if (xmlEntry) {
             const xmlText = xmlEntry.getData().toString("utf8");
