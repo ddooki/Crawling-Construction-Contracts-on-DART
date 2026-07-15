@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import https from "https";
 import AdmZip from "adm-zip";
 import xml2js from "xml2js";
+import { fileURLToPath } from "url";
 
 const { parseStringPromise } = xml2js;
 
@@ -320,6 +321,9 @@ async function startServer() {
   });
 }
 
-startServer();
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (isMain) {
+  startServer();
+}
 
 export default app;
