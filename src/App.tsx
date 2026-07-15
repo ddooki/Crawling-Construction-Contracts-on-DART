@@ -97,7 +97,7 @@ export default function App() {
       const queryParams = new URLSearchParams({
         start: startDate,
         end: endDate,
-        company: selectedCompany || 'all',
+        company: 'all',
         custom_companies: JSON.stringify(customCompanies)
       });
       const res = await fetch(`/api/disclosures?${queryParams.toString()}`);
@@ -149,7 +149,7 @@ export default function App() {
 
   useEffect(() => {
     fetchDisclosures();
-  }, [selectedCompany, startDate, endDate, customCompanies]);
+  }, [startDate, endDate, customCompanies]);
 
   const handleSendReport = async () => {
     setIsSending(true);
