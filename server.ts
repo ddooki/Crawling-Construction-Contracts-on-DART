@@ -3,11 +3,10 @@ import path from "path";
 import axios from "axios";
 import dotenv from "dotenv";
 import https from "https";
-import { createRequire } from "module";
+import AdmZip from "adm-zip";
+import xml2js from "xml2js";
 
-const require = createRequire(import.meta.url);
-const AdmZip = require("adm-zip");
-const { parseStringPromise } = require("xml2js");
+const { parseStringPromise } = xml2js;
 
 dotenv.config();
 
