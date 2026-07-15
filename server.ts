@@ -116,7 +116,8 @@ const TARGET_COMPANIES = [
   '현대엔지니어링', '포스코이앤씨', '롯데건설', '에스케이에코플랜트', 
   '에이치디씨현대산업개발', '한화', '호반건설', '디엘건설', 
   '두산에너빌리티', '계룡건설산업', '서희건설', '제일건설', 
-  '코오롱글로벌', '태영건설'
+  '코오롱글로벌', '태영건설', '금호건설', '쌍용건설', '우미건설',
+  'KCC건설', '한신공영', '동부건설', 'HL디앤아이한라', '서한'
 ];
 
 // Pre-mapped DART corp codes for target companies to avoid downloading large XML and ECONNRESET issues
@@ -139,7 +140,15 @@ const corpCodeMap: Record<string, string> = {
   '계룡건설산업': '00102432',
   '서희건설': '00219848',
   '코오롱글로벌': '00152880',
-  '태영건설': '00153861'
+  '태영건설': '00153861',
+  '금호건설': '00115719',
+  '쌍용건설': '00138242',
+  '우미건설': '00257325',
+  'KCC건설': '00155054',
+  '한신공영': '00112448',
+  '동부건설': '00119256',
+  'HL디앤아이한라': '00140229',
+  '서한': '00147688'
 };
 
 app.get("/api/companies", (req, res) => {
@@ -186,39 +195,47 @@ app.get("/api/disclosures", async (req, res) => {
   const formattedStart = searchStart.replace(/-/g, "");
   const formattedEnd = searchEnd.replace(/-/g, "");
 
+  let extendedCorpMap = { ...corpCodeMap };
+  if (req.query.custom_companies) {
+    try {
+      const parsed = JSON.parse(req.query.custom_companies as string);
+      extendedCorpMap = { ...extendedCorpMap, ...parsed };
+    } catch (e) {
+      console.error("Failed to parse custom_companies", e);
+    }
+  }
+
   let targetCorpCodes: Array<{name: string, code: string}> = [];
   
   if (company && company !== "all") {
-    const code = corpCodeMap[company as string];
+    const code = extendedCorpMap[company as string];
     if (code) targetCorpCodes.push({ name: company as string, code });
   } else {
-    targetCorpCodes = Object.keys(corpCodeMap).map(k => ({ name: k, code: corpCodeMap[k] }));
+    targetCorpCodes = Object.keys(extendedCorpMap).map(k => ({ name: k, code: extendedCorpMap[k] }));
   }
 
   let results: any[] = [];
   
   try {
-    let prelimResults: any[] = [];
-
-    for (const target of targetCorpCodes) {
-      let listRes;
+    // Fetch all company lists in parallel to prevent Vercel timeout
+    const listPromises = targetCorpCodes.map(async (target) => {
       try {
-        listRes = await fetchDartAPI("https://opendart.fss.or.kr/api/list.json", {
+        const listRes = await fetchDartAPI("https://opendart.fss.or.kr/api/list.json", {
           params: { crtfc_key: apiKey, corp_code: target.code, bgn_de: formattedStart, end_de: formattedEnd, pblntf_detail_ty: "I001", page_count: 100 }
         });
-      } catch (err: any) {
-         console.error(`Failed permanently for ${target.name}:`, err.message);
-         continue;
-      }
-
-      if (listRes && listRes.data && listRes.data.status === "000" && listRes.data.list) {
-        for (const item of listRes.data.list) {
-          if (item.report_nm.includes("단일판매") || item.report_nm.includes("수주") || item.report_nm.includes("공급계약")) {
-            prelimResults.push({ item, target });
-          }
+        if (listRes && listRes.data && listRes.data.status === "000" && listRes.data.list) {
+          return listRes.data.list
+            .filter((item: any) => item.report_nm.includes("단일판매") || item.report_nm.includes("수주") || item.report_nm.includes("공급계약"))
+            .map((item: any) => ({ item, target }));
         }
+      } catch (err: any) {
+        console.error(`Failed for ${target.name}:`, err.message);
       }
-    }
+      return [];
+    });
+
+    const listResults = await Promise.all(listPromises);
+    const prelimResults = listResults.flat();
 
     // Process document fetching concurrently (e.g. up to 10 chunks to not blast the event loop immediately if there are many)
     const chunkSize = 15;
