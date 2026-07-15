@@ -150,27 +150,13 @@ app.get("/api/check-key", (req, res) => {
   });
 });
 
-function getMockData(company: string, start: string, end: string) {
-  let mockData = [
-    { id: "01", company: "현대건설", title: "단일판매·공급계약체결", description: "현장명: 사우디 가스처리 시설 건설 / 최종금액: 34,500억원", date: "2026-03-15", rcept_no: "20260315000122" },
-    { id: "02", company: "지에스건설", title: "단일판매·공급계약체결", description: "현장명: 평택 물류센터 신축공사 / 최종금액: 1,200억원", date: "2026-02-10", rcept_no: "20260210000451" },
-    { id: "03", company: "삼성물산", title: "단일판매·공급계약체결", description: "현장명: 카타르 태양광 발전소 / 최종금액: 5,100억원", date: "2026-01-20", rcept_no: "20260120000882" },
-    { id: "04", company: "대우건설", title: "단일판매·공급계약체결", description: "현장명: 나이지리아 LNG 플랜트 / 최종금액: 2,800억원", date: "2025-12-05", rcept_no: "20251205000221" },
-    { id: "05", company: "현대건설", title: "단일판매·공급계약체결", description: "현장명: 서울 신반포4지구 재건축 / 최종금액: 1,500억원", date: "2025-10-12", rcept_no: "20251012000554" },
-    { id: "06", company: "디엘이앤씨", title: "단일판매·공급계약체결", description: "현장명: 울산 S-Oil 부지 조성 / 최종금액: 4,200억원", date: "2025-08-30", rcept_no: "20250830000112" },
-  ];
-  if (company && company !== "all") mockData = mockData.filter(d => d.company === company);
-  if (start && end) mockData = mockData.filter(d => d.date >= start && d.date <= end);
-  return mockData;
-}
-
-// Mock disclosures for UI demo
+// Disclosures endpoint
 app.get("/api/disclosures", async (req, res) => {
   const { start, end, company } = req.query;
   const apiKey = process.env.DART_API_KEY;
 
   if (!apiKey || apiKey === "your-dart-api-key-here") {
-    return res.json(getMockData(company as string, start as string, end as string));
+    return res.status(401).json({ error: "DART API Key가 설정되지 않았습니다. Vercel 환경 변수에 DART_API_KEY를 등록해 주세요." });
   }
 
   let searchStart = start as string;

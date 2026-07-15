@@ -55,6 +55,7 @@ export default function App() {
   });
 
   const [disclosures, setDisclosures] = useState<any[]>([]);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [status, setStatus] = useState<any>({});
   
@@ -92,6 +93,7 @@ export default function App() {
     }, 150);
 
     try {
+      setApiError(null);
       const queryParams = new URLSearchParams({
         start: startDate,
         end: endDate,
@@ -100,28 +102,15 @@ export default function App() {
       });
       const res = await fetch(`/api/disclosures?${queryParams.toString()}`);
       if (!res.ok) {
-        throw new Error('API response was not OK');
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'DART API 연동 중 오류가 발생했습니다.');
       }
       const data = await res.json();
       setDisclosures(data);
-    } catch (err) {
-      console.error("API Error - falling back to mock data:", err);
-      // Client-side mock data fallback to ensure the dashboard is always populated
-      const mockData = [
-        { id: "01", company: "현대건설", title: "단일판매·공급계약체결", description: "현장명: 사우디 가스처리 시설 건설 / 최종금액: 3조 4,500억원", date: "2026-03-15", rcept_no: "20260315000122" },
-        { id: "02", company: "지에스건설", title: "단일판매·공급계약체결", description: "현장명: 평택 물류센터 신축공사 / 최종금액: 1,200억원", date: "2026-02-10", rcept_no: "20260210000451" },
-        { id: "03", company: "삼성물산", title: "단일판매·공급계약체결", description: "현장명: 카타르 태양광 발전소 / 최종금액: 5,100억원", date: "2026-01-20", rcept_no: "20260120000882" },
-        { id: "04", company: "대우건설", title: "단일판매·공급계약체결", description: "현장명: 나이지리아 LNG 플랜트 / 최종금액: 2,800억원", date: "2025-12-05", rcept_no: "20251205000221" },
-        { id: "05", company: "현대건설", title: "단일판매·공급계약체결", description: "현장명: 서울 신반포4지구 재건축 / 최종금액: 1,500억원", date: "2025-10-12", rcept_no: "20251012000554" },
-        { id: "06", company: "디엘이앤씨", title: "단일판매·공급계약체결", description: "현장명: 울산 S-Oil 부지 조성 / 최종금액: 4,200억원", date: "2025-08-30", rcept_no: "20250830000112" },
-      ];
-      // Filter mock data by date and selected company
-      let filteredMock = mockData;
-      if (selectedCompany) {
-        filteredMock = mockData.filter(d => d.company === selectedCompany);
-      }
-      filteredMock = filteredMock.filter(d => d.date >= startDate && d.date <= endDate);
-      setDisclosures(filteredMock);
+    } catch (err: any) {
+      console.error("API Error:", err);
+      setApiError(err.message || '오픈 API 연동에 실패했습니다.');
+      setDisclosures([]);
     } finally {
       clearInterval(progressInterval);
       setLoadProgress(100);
@@ -453,9 +442,25 @@ export default function App() {
                     <tr>
                       <td colSpan={5} className="py-12 px-6 text-center text-on-surface-variant">
                         <div className="flex flex-col items-center justify-center max-w-2xl mx-auto">
-                          <Info className="w-10 h-10 text-slate-300 mb-3" />
-                          <p className="text-[15px] font-bold text-primary">해당 조건에 맞는 공시 데이터가 존재하지 않습니다.</p>
-                          <p className="text-xs text-outline mt-1 mb-6">상단의 데이터 갱신 버튼을 눌러보거나 조회 기간을 늘려주세요.</p>
+                          {apiError ? (
+                            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-left flex gap-3 items-start w-full">
+                              <Info className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
+                              <div>
+                                <h4 className="text-xs font-bold text-red-800 uppercase tracking-wide mb-1">
+                                  DART 연동 에러 안내
+                                </h4>
+                                <p className="text-xs text-red-600 leading-relaxed font-semibold">
+                                  {apiError}
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <Info className="w-10 h-10 text-slate-300 mb-3" />
+                              <p className="text-[15px] font-bold text-primary">해당 조건에 맞는 공시 데이터가 존재하지 않습니다.</p>
+                              <p className="text-xs text-outline mt-1 mb-6">상단의 데이터 갱신 버튼을 눌러보거나 조회 기간을 늘려주세요.</p>
+                            </>
+                          )}
                           
                           {selectedCompany ? (
                             UNLISTED_OR_SPECIAL_COMPANIES[selectedCompany] ? (
