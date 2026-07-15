@@ -149,19 +149,19 @@ export default function App() {
       {/* Sidebar Navigation */}
       <aside className="flex flex-col h-screen fixed left-0 top-0 w-sidebar-width z-40 bg-primary shadow-md">
         <div className="py-gutter px-4 flex flex-col items-center">
-          <h1 className="text-2xl font-extrabold text-on-primary text-center tracking-wide leading-tight mt-6 mb-2">
+          <h1 className="text-[16px] font-bold text-on-primary/90 text-center tracking-wide leading-tight mt-6 mb-2">
             주요 건설사 수주 현황
           </h1>
         </div>
         
-        <nav className="flex-1 px-4 mt-6 overflow-y-auto custom-scrollbar space-y-2">
+        <nav className="flex-1 px-4 mt-4 overflow-y-auto custom-scrollbar space-y-2">
           {/* 전체 보기 */}
           <div 
             onClick={() => setSelectedCompany(null)}
-            className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer duration-200 rounded-lg group ${!selectedCompany ? 'sidebar-active' : 'text-on-primary/70 hover:text-white hover:bg-white/5'}`}
+            className={`flex items-center gap-3 px-4 py-3 cursor-pointer duration-200 rounded-lg group ${!selectedCompany ? 'sidebar-active' : 'text-on-primary/70 hover:text-white hover:bg-white/5'}`}
           >
-            <span className="material-symbols-outlined text-[22px]">dashboard</span>
-            <span className="text-[15px] font-bold">전체 보기</span>
+            <span className="material-symbols-outlined text-[20px] leading-none">dashboard</span>
+            <span className="text-[14px] font-semibold leading-none">전체 보기</span>
           </div>
 
           {/* 기업 목록 */}
@@ -172,8 +172,8 @@ export default function App() {
                 onClick={() => setSelectedCompany(name)}
                 className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer duration-200 rounded-lg group ${selectedCompany === name ? 'sidebar-active' : 'text-on-primary/70 hover:text-white hover:bg-white/5'}`}
               >
-                <span className="material-symbols-outlined text-[18px]">corporate_fare</span>
-                <span className="text-[14px] font-medium">{name}</span>
+                <span className="material-symbols-outlined text-[16px] leading-none">corporate_fare</span>
+                <span className="text-[13px] font-medium leading-none">{name}</span>
               </div>
             ))}
           </div>
@@ -182,10 +182,10 @@ export default function App() {
           <div className="pt-4 border-t border-white/10">
             <button 
               onClick={() => setShowAddCompanyModal(true)}
-              className="w-full py-3.5 bg-secondary text-white text-[14px] font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 bg-secondary text-white text-[13px] font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5 px-4"
             >
-              <span className="material-symbols-outlined text-[18px]">add</span>
-              신규 건설사 추가
+              <span className="material-symbols-outlined text-[18px] leading-none">add</span>
+              <span className="leading-none">신규 건설사 추가</span>
             </button>
           </div>
         </nav>
@@ -195,8 +195,8 @@ export default function App() {
             onClick={() => alert("설정 메뉴는 준비 중입니다.")}
             className="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-white hover:bg-white/5 cursor-pointer duration-200 rounded-lg"
           >
-            <span className="material-symbols-outlined text-[20px]">settings</span>
-            <span className="text-[14px] font-medium">설정</span>
+            <span className="material-symbols-outlined text-[18px] leading-none">settings</span>
+            <span className="text-[13px] font-medium leading-none">설정</span>
           </div>
         </div>
       </aside>
@@ -206,7 +206,7 @@ export default function App() {
         {/* Top Navigation Bar */}
         <header className="flex justify-between items-center w-[calc(100%-var(--spacing-sidebar-width))] px-gutter h-16 fixed top-0 right-0 z-30 bg-surface-container-lowest border-b border-outline-variant">
           <div className="flex items-center gap-8">
-            <span className="text-2xl font-extrabold text-primary tracking-tight">DART 건설 공시 모니터링 시스템</span>
+            <span className="text-[17px] font-bold text-primary tracking-tight">DART 건설 공시 모니터링 시스템</span>
             
             {/* 조회 기간 */}
             <div className="flex items-center gap-4 bg-surface-container-low px-4 py-1.5 rounded-lg border border-outline-variant/30">
@@ -243,7 +243,7 @@ export default function App() {
           {/* Action Header */}
           <div className="flex justify-between items-end mb-8 mt-4">
             <div>
-              <h2 className="text-3xl font-extrabold text-primary mb-1">현황 대시보드</h2>
+              <h2 className="text-[17px] font-bold text-primary mb-1">현황 대시보드</h2>
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-1 text-[13px] font-bold text-secondary">
                   <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
