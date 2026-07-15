@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 export default function App() {
   const [defaultCompanies, setDefaultCompanies] = useState<string[]>([
-    '삼성물산', '현대건설', '대우건설', '현대엔지니어링', '지에스건설',
-    '디엘이앤씨', '포스코이앤씨', '롯데건설', '에스케이에코플랜트', '에이치디씨현대산업개발',
-    '한화', '호반건설', '제일건설', '대방건설', '중흥토건',
-    '태영건설', '금호건설', '계룡건설산업', '서희건설', '코오롱글로벌'
+    '삼성물산', '현대건설', '대우건설', '디엘이앤씨', '지에스건설',
+    '현대엔지니어링', '포스코이앤씨', '롯데건설', '에스케이에코플랜트', '에이치디씨현대산업개발',
+    '한화', '호반건설', '디엘건설', '두산에너빌리티', '계룡건설산업',
+    '서희건설', '제일건설', '코오롱글로벌', '태영건설', '케이씨씨건설'
   ]);
   const [customCompanies, setCustomCompanies] = useState<Record<string, string>>(() => {
     try {
