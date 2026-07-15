@@ -169,22 +169,8 @@ app.get("/api/disclosures", async (req, res) => {
     return res.json(getMockData(company as string, start as string, end as string));
   }
 
-  // Real DART API fetching
-  
-  // NOTE: Sandbox clock is 2026, real world is 2024.
-  // To fetch real data, if the user requested 2025~2026, we MUST offset it by -2 years to search 2023~2024 in DART.
-  // We'll compute an offset based on current system year.
-  const systemYear = new Date().getFullYear();
-  const yearOffset = systemYear - 2024; // If system is 2026, offset is 2.
-  
   let searchStart = start as string;
   let searchEnd = end as string;
-  if (yearOffset > 0) {
-    const startY = parseInt(searchStart.slice(0, 4)) - yearOffset;
-    const endY = parseInt(searchEnd.slice(0, 4)) - yearOffset;
-    searchStart = `${startY}${searchStart.slice(4)}`;
-    searchEnd = `${endY}${searchEnd.slice(4)}`;
-  }
   
   const formattedStart = searchStart.replace(/-/g, "");
   const formattedEnd = searchEnd.replace(/-/g, "");
@@ -238,8 +224,7 @@ app.get("/api/disclosures", async (req, res) => {
       
       const chunkResults = await Promise.all(chunk.map(async ({ item, target }) => {
         const d = item.rcept_dt;
-        const originalYear = parseInt(d.slice(0, 4)) + yearOffset;
-        const formattedDate = originalYear + "-" + d.slice(4, 6) + "-" + d.slice(6, 8);
+        const formattedDate = d.slice(0, 4) + "-" + d.slice(4, 6) + "-" + d.slice(6, 8);
         
         let description = `계약체결명: 확인 필요 (다운로드 불가)`;
         let title = item.report_nm || "단일판매·공급계약체결"; 
@@ -294,14 +279,12 @@ app.get("/api/disclosures", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Error fetching disclosures from DART:", err.message);
+    return res.status(500).json({ error: "DART API 조회 중 오류가 발생했습니다: " + err.message });
   }
 
   // Sort by date descending
   results.sort((a, b) => b.date.localeCompare(a.date));
   
-  if (results.length === 0) {
-    return res.json(getMockData(company as string, start as string, end as string));
-  }
   res.json(results);
 });
 
