@@ -14,13 +14,7 @@ const dartAxios = axios.create({
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     'Accept': 'application/json, text/plain, */*',
     'Connection': 'keep-alive'
-  },
-  httpsAgent: new https.Agent({
-    keepAlive: true,
-    maxSockets: 10,
-    maxFreeSockets: 5,
-    timeout: 60000, // 60s
-  }),
+  }
 });
 
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -144,6 +138,16 @@ const corpCodeMap: Record<string, string> = {
 
 app.get("/api/companies", (req, res) => {
   res.json(TARGET_COMPANIES);
+});
+
+app.get("/api/check-key", (req, res) => {
+  const apiKey = process.env.DART_API_KEY;
+  res.json({
+    keyExists: !!apiKey,
+    keyLength: apiKey ? apiKey.length : 0,
+    preview: apiKey ? `${apiKey.slice(0, 4)}...${apiKey.slice(-4)}` : "none",
+    nodeEnv: process.env.NODE_ENV || "unknown"
+  });
 });
 
 function getMockData(company: string, start: string, end: string) {
