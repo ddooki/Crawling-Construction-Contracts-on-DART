@@ -1,4 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Plus, 
+  Settings, 
+  RefreshCw, 
+  History, 
+  Send, 
+  Info, 
+  HelpCircle, 
+  CheckCircle2, 
+  X, 
+  ExternalLink, 
+  Bell 
+} from 'lucide-react';
 
 const UNLISTED_OR_SPECIAL_COMPANIES: Record<string, string> = {
   '현대엔지니어링': '비상장사로 일반적인 상장사와 달리 주요사항보고(수주 공시) 제출 의무 범위가 다르며, 2025년 기준 계약 공시를 올리지 않았습니다.',
@@ -12,6 +25,17 @@ const UNLISTED_OR_SPECIAL_COMPANIES: Record<string, string> = {
   '중흥토건': '비상장 기업으로 수주 계약에 대한 DART 의무 공시가 없습니다.',
   '쌍용건설': '비상장사로 대외 수주 공시 의무가 없습니다.',
   '우미건설': '비상장사로 DART 수주 공시를 직접 제출하지 않는 법인입니다.'
+};
+
+// Korean grammatical postposition helper (은/는)
+const getTopicMarker = (word: string) => {
+  if (!word) return '';
+  const lastChar = word.charCodeAt(word.length - 1);
+  if (lastChar >= 0xAC00 && lastChar <= 0xD7A3) {
+    const hasJongseong = (lastChar - 0xAC00) % 28 > 0;
+    return hasJongseong ? '은' : '는';
+  }
+  return '은/는';
 };
 
 export default function App() {
@@ -218,10 +242,10 @@ export default function App() {
           <div className="pt-4 border-t border-white/10">
             <button 
               onClick={() => setShowAddCompanyModal(true)}
-              className="w-full py-3 bg-secondary text-white text-[13px] font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5 px-4"
+              className="w-full py-3 bg-secondary text-white text-[13px] font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2 px-4 shadow-sm"
             >
-              <span className="material-symbols-outlined text-[18px] leading-none">add</span>
-              <span className="leading-none">신규 건설사 추가</span>
+              <Plus className="w-4 h-4 shrink-0" />
+              <span>신규 건설사 추가</span>
             </button>
           </div>
         </nav>
@@ -231,7 +255,7 @@ export default function App() {
             onClick={() => alert("설정 메뉴는 준비 중입니다.")}
             className="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-white hover:bg-white/5 cursor-pointer duration-200 rounded-lg"
           >
-            <span className="material-symbols-outlined text-[18px] leading-none">settings</span>
+            <Settings className="w-4 h-4 shrink-0" />
             <span className="text-[13px] font-medium leading-none">설정</span>
           </div>
         </div>
@@ -269,7 +293,7 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             <button className="p-2.5 hover:bg-surface-container-low transition-colors rounded-full cursor-pointer">
-              <span className="material-symbols-outlined text-[22px] text-on-surface-variant">notifications</span>
+              <Bell className="w-5 h-5 text-on-surface-variant" />
             </button>
           </div>
         </header>
@@ -296,14 +320,14 @@ export default function App() {
                 disabled={isLoading}
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-secondary text-secondary rounded-lg font-bold hover:bg-secondary/5 transition-all disabled:opacity-50 text-sm"
               >
-                <span className={`material-symbols-outlined text-[18px] ${isLoading ? 'animate-spin' : ''}`}>sync</span>
+                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                 {isLoading ? '데이터 갱신 중' : '데이터 갱신'}
               </button>
               <button 
                 onClick={() => setShowHistoryModal(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-secondary text-secondary rounded-lg font-bold hover:bg-secondary/5 transition-all text-sm"
               >
-                <span className="material-symbols-outlined text-[18px]">history</span>
+                <History className="w-4 h-4" />
                 발송 이력
               </button>
               <button 
@@ -316,7 +340,7 @@ export default function App() {
                 }}
                 className="flex items-center gap-2 px-6 py-2 bg-secondary text-white rounded-lg font-bold hover:opacity-90 shadow-sm transition-all text-sm"
               >
-                <span className="material-symbols-outlined text-[18px]">send</span>
+                <Send className="w-4 h-4" />
                 보고서 발송
               </button>
             </div>
@@ -419,8 +443,8 @@ export default function App() {
                             target="_blank"
                             rel="noreferrer"
                           >
-                            원문보기
-                            <span className="material-symbols-outlined text-[15px]">open_in_new</span>
+                            <span>원문보기</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                         </td>
                       </tr>
@@ -429,44 +453,52 @@ export default function App() {
                     <tr>
                       <td colSpan={5} className="py-12 px-6 text-center text-on-surface-variant">
                         <div className="flex flex-col items-center justify-center max-w-2xl mx-auto">
-                          <span className="material-symbols-outlined text-4xl text-outline mb-3">info</span>
+                          <Info className="w-10 h-10 text-slate-300 mb-3" />
                           <p className="text-[15px] font-bold text-primary">해당 조건에 맞는 공시 데이터가 존재하지 않습니다.</p>
                           <p className="text-xs text-outline mt-1 mb-6">상단의 데이터 갱신 버튼을 눌러보거나 조회 기간을 늘려주세요.</p>
                           
                           {selectedCompany ? (
                             UNLISTED_OR_SPECIAL_COMPANIES[selectedCompany] ? (
-                              <div className="w-full p-4 bg-surface-container-low border border-outline-variant/30 rounded-lg text-left">
-                                <p className="text-xs font-bold text-secondary flex items-center gap-1.5 mb-1">
-                                  <span className="material-symbols-outlined text-sm leading-none">help</span>
-                                  이 기업의 공시가 수집되지 않은 이유
-                                </p>
-                                <p className="text-xs text-on-surface-variant leading-relaxed">
-                                  <strong>{selectedCompany}</strong>은(는) {UNLISTED_OR_SPECIAL_COMPANIES[selectedCompany]}
-                                </p>
+                              <div className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl text-left shadow-sm flex gap-3 items-start">
+                                <HelpCircle className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
+                                <div>
+                                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+                                    공시 미수집 안내
+                                  </h4>
+                                  <p className="text-xs text-slate-500 leading-relaxed">
+                                    <strong>{selectedCompany}</strong>{getTopicMarker(selectedCompany)} {UNLISTED_OR_SPECIAL_COMPANIES[selectedCompany]}
+                                  </p>
+                                </div>
                               </div>
                             ) : (
-                              <div className="w-full p-4 bg-surface-container-low border border-outline-variant/30 rounded-lg text-left">
-                                <p className="text-xs font-bold text-secondary flex items-center gap-1.5 mb-1">
-                                  <span className="material-symbols-outlined text-sm leading-none">check_circle</span>
-                                  공시 확인 안내
-                                </p>
-                                <p className="text-xs text-on-surface-variant leading-relaxed">
-                                  <strong>{selectedCompany}</strong>은(는) 상장 회사이나, 설정된 조회 기간 내에 DART에 공시된 수주 계약(단일판매ㆍ공급계약체결) 내역이 존재하지 않습니다.
-                                </p>
+                              <div className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl text-left shadow-sm flex gap-3 items-start">
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                                <div>
+                                  <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-1">
+                                    공시 확인 안내
+                                  </h4>
+                                  <p className="text-xs text-slate-500 leading-relaxed">
+                                    <strong>{selectedCompany}</strong>{getTopicMarker(selectedCompany)} 상장 회사이나, 설정된 조회 기간 내에 DART에 공시된 수주 계약(단일판매ㆍ공급계약체결) 내역이 존재하지 않습니다.
+                                  </p>
+                                </div>
                               </div>
                             )
                           ) : (
-                            <div className="w-full p-4.5 bg-surface-container-low border border-outline-variant/30 rounded-lg text-left">
-                              <p className="text-xs font-bold text-secondary flex items-center gap-1.5 mb-2">
-                                <span className="material-symbols-outlined text-sm leading-none">help</span>
-                                일부 건설사 공시 미표시 안내
-                              </p>
-                              <p className="text-xs text-on-surface-variant leading-relaxed mb-2.5">
-                                아래와 같은 비상장 기업들은 주식시장에 상장되어 있지 않아 DART에 수주 관련 주요사항보고서(수시공시)를 직접 제출하지 않으므로 검색 리스트에 나타나지 않을 수 있습니다.
-                              </p>
-                              <div className="flex flex-wrap gap-1.5">
+                            <div className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl text-left shadow-sm">
+                              <div className="flex gap-3 items-start mb-3">
+                                <HelpCircle className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
+                                <div>
+                                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+                                    일부 건설사 공시 미표시 안내
+                                  </h4>
+                                  <p className="text-xs text-slate-500 leading-relaxed">
+                                    아래와 같은 비상장 기업들은 주식시장에 상장되어 있지 않아 DART에 수주 관련 주요사항보고서(수시공시)를 직접 제출하지 않으므로 검색 리스트에 나타나지 않을 수 있습니다.
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5 pl-8">
                                 {Object.keys(UNLISTED_OR_SPECIAL_COMPANIES).map((name, i) => (
-                                  <span key={i} className="text-[11px] bg-white border border-outline-variant/40 px-2 py-0.5 rounded text-primary font-semibold">
+                                  <span key={i} className="text-[11px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-600 font-semibold shadow-sm">
                                     {name}
                                   </span>
                                 ))}
@@ -521,8 +553,8 @@ export default function App() {
                   <span className="material-symbols-outlined">add_business</span>
                   신규 건설사 추가
                 </h3>
-                <button onClick={() => setShowAddCompanyModal(false)} className="text-outline hover:text-on-surface">
-                  <span className="material-symbols-outlined">close</span>
+                <button onClick={() => setShowAddCompanyModal(false)} className="text-outline hover:text-on-surface flex items-center justify-center">
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
@@ -572,11 +604,11 @@ export default function App() {
             <div className="p-6">
               <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h3 className="text-lg font-bold text-primary flex items-center gap-2">
-                  <span className="material-symbols-outlined">history</span>
-                  메일 발송 이력 확인
+                  <History className="w-5 h-5 text-secondary" />
+                  <span>메일 발송 이력 확인</span>
                 </h3>
-                <button onClick={() => setShowHistoryModal(false)} className="text-outline hover:text-on-surface">
-                  <span className="material-symbols-outlined">close</span>
+                <button onClick={() => setShowHistoryModal(false)} className="text-outline hover:text-on-surface flex items-center justify-center">
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
@@ -624,12 +656,12 @@ export default function App() {
             <div className="p-6">
               <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h3 className="text-lg font-bold text-primary flex items-center gap-2">
-                  <span className="material-symbols-outlined">send</span>
-                  보고서 이메일 발송
+                  <Send className="w-5 h-5 text-secondary" />
+                  <span>보고서 이메일 발송</span>
                 </h3>
                 {!showConfirm && (
-                  <button onClick={() => setShowModal(false)} className="text-outline hover:text-on-surface">
-                    <span className="material-symbols-outlined">close</span>
+                  <button onClick={() => setShowModal(false)} className="text-outline hover:text-on-surface flex items-center justify-center">
+                    <X className="w-5 h-5" />
                   </button>
                 )}
               </div>
@@ -676,7 +708,7 @@ export default function App() {
               ) : (
                 <div className="text-center space-y-6 py-2">
                   <div className="w-16 h-16 bg-secondary-container text-secondary rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                    <span className="material-symbols-outlined text-3xl">send</span>
+                    <Send className="w-8 h-8" />
                   </div>
                   <h4 className="text-lg font-bold text-primary">이메일을 보내시겠습니까?</h4>
                   <p className="text-xs text-on-surface-variant leading-relaxed">
@@ -721,7 +753,7 @@ export default function App() {
       >
         <div className="flex justify-between items-center text-xs text-on-surface-variant mb-2 font-bold tracking-wide">
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-xs animate-spin text-secondary">sync</span>
+            <RefreshCw className="w-3.5 h-3.5 animate-spin text-secondary" />
             데이터 연동 중...
           </span>
           <span className="text-secondary">{Math.floor(loadProgress)}%</span>
