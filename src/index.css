@@ -1,0 +1,43 @@
+@import url('https://cdn.jsdelivr.net/gh/moonspam/NanumBaruGothic@latest/nanumbarugothic.css');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "NanumBaruGothic", sans-serif;
+  --font-serif: "NanumBaruGothic", sans-serif;
+  --font-mono: "NanumBaruGothic", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#0A0A0C] text-[#D1D5DB] overflow-hidden antialiased;
+    font-size: 16px; /* Approx 12pt, Excel 11pt min satisfied */
+    font-family: "NanumBaruGothic", sans-serif;
+  }
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+input[type="date"] {
+  position: relative;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #1F2937;
+  border-radius: 10px;
+}
+
