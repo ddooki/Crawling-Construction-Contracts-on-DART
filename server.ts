@@ -215,7 +215,7 @@ app.get("/api/disclosures", async (req, res) => {
     const listPromises = targetCorpCodes.map(async (target) => {
       try {
         const listRes = await fetchDartAPI("https://opendart.fss.or.kr/api/list.json", {
-          params: { crtfc_key: apiKey, corp_code: target.code, bgn_de: formattedStart, end_de: formattedEnd, pblntf_detail_ty: "I001", page_count: 100 }
+          params: { crtfc_key: apiKey, corp_code: target.code, bgn_de: formattedStart, end_de: formattedEnd, page_count: 100 }
         });
         if (listRes && listRes.data && listRes.data.status === "000" && listRes.data.list) {
           return listRes.data.list
