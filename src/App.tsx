@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
+const UNLISTED_OR_SPECIAL_COMPANIES: Record<string, string> = {
+  '현대엔지니어링': '비상장사로 일반적인 상장사와 달리 주요사항보고(수주 공시) 제출 의무 범위가 다르며, 2025년 기준 계약 공시를 올리지 않았습니다.',
+  '포스코이앤씨': '비상장사로 DART 수시공시(단일판매 공급계약) 대상에서 제외되거나 자체 등록하지 않았습니다.',
+  '롯데건설': '비상장 기업으로 주식시장에 상장되어 있지 않아 직접 공시 의무가 없습니다.',
+  '에스케이에코플랜트': '비상장 기업으로 주요 수주 공시가 대외적으로 공개 등록되지 않았습니다.',
+  '호반건설': '비상장사로 수주 계약에 관한 DART 공시 의무가 존재하지 않습니다.',
+  '디엘건설': '디엘이앤씨와 합병되면서 상장 폐지되었고, 독립된 수주 공시를 등록하지 않습니다.',
+  '제일건설': '비상장 기업으로 대외 공시 의무가 없어 DART에서 수주 내역을 찾을 수 없습니다.',
+  '대방건설': '비상장 기업으로 수주 관련 공정공시 및 주요사항 보고서를 제출하지 않습니다.',
+  '중흥토건': '비상장 기업으로 수주 계약에 대한 DART 의무 공시가 없습니다.',
+  '쌍용건설': '비상장사로 대외 수주 공시 의무가 없습니다.',
+  '우미건설': '비상장사로 DART 수주 공시를 직접 제출하지 않는 법인입니다.'
+};
+
 export default function App() {
   const [defaultCompanies, setDefaultCompanies] = useState<string[]>([
     '삼성물산', '현대건설', '대우건설', '디엘이앤씨', '지에스건설',
@@ -182,10 +196,9 @@ export default function App() {
           {/* 전체 보기 */}
           <div 
             onClick={() => setSelectedCompany(null)}
-            className={`flex items-center gap-3 px-4 py-3 cursor-pointer duration-200 rounded-lg group ${!selectedCompany ? 'sidebar-active' : 'text-on-primary/70 hover:text-white hover:bg-white/5'}`}
+            className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer duration-200 rounded-lg group ${!selectedCompany ? 'sidebar-active' : 'text-on-primary/70 hover:text-white hover:bg-white/5'}`}
           >
-            <span className="material-symbols-outlined text-[20px] leading-none">dashboard</span>
-            <span className="text-[14px] font-semibold leading-none">전체 보기</span>
+            <span className="text-[14px] font-bold">전체 보기</span>
           </div>
 
           {/* 기업 목록 */}
@@ -196,7 +209,6 @@ export default function App() {
                 onClick={() => setSelectedCompany(name)}
                 className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer duration-200 rounded-lg group ${selectedCompany === name ? 'sidebar-active' : 'text-on-primary/70 hover:text-white hover:bg-white/5'}`}
               >
-                <span className="material-symbols-outlined text-[16px] leading-none">corporate_fare</span>
                 <span className="text-[13px] font-medium leading-none">{name}</span>
               </div>
             ))}
@@ -415,11 +427,52 @@ export default function App() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="py-20 text-center text-on-surface-variant">
-                        <div className="flex flex-col items-center justify-center">
-                          <span className="material-symbols-outlined text-5xl text-outline mb-2">info</span>
-                          <p className="text-[15px] font-bold">해당 조건에 맞는 공시 데이터가 존재하지 않습니다.</p>
-                          <p className="text-xs text-outline mt-1">상단의 데이터 갱신 버튼을 눌러보거나 조회 기간을 늘려주세요.</p>
+                      <td colSpan={5} className="py-12 px-6 text-center text-on-surface-variant">
+                        <div className="flex flex-col items-center justify-center max-w-2xl mx-auto">
+                          <span className="material-symbols-outlined text-4xl text-outline mb-3">info</span>
+                          <p className="text-[15px] font-bold text-primary">해당 조건에 맞는 공시 데이터가 존재하지 않습니다.</p>
+                          <p className="text-xs text-outline mt-1 mb-6">상단의 데이터 갱신 버튼을 눌러보거나 조회 기간을 늘려주세요.</p>
+                          
+                          {selectedCompany ? (
+                            UNLISTED_OR_SPECIAL_COMPANIES[selectedCompany] ? (
+                              <div className="w-full p-4 bg-surface-container-low border border-outline-variant/30 rounded-lg text-left">
+                                <p className="text-xs font-bold text-secondary flex items-center gap-1.5 mb-1">
+                                  <span className="material-symbols-outlined text-sm leading-none">help</span>
+                                  이 기업의 공시가 수집되지 않은 이유
+                                </p>
+                                <p className="text-xs text-on-surface-variant leading-relaxed">
+                                  <strong>{selectedCompany}</strong>은(는) {UNLISTED_OR_SPECIAL_COMPANIES[selectedCompany]}
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="w-full p-4 bg-surface-container-low border border-outline-variant/30 rounded-lg text-left">
+                                <p className="text-xs font-bold text-secondary flex items-center gap-1.5 mb-1">
+                                  <span className="material-symbols-outlined text-sm leading-none">check_circle</span>
+                                  공시 확인 안내
+                                </p>
+                                <p className="text-xs text-on-surface-variant leading-relaxed">
+                                  <strong>{selectedCompany}</strong>은(는) 상장 회사이나, 설정된 조회 기간 내에 DART에 공시된 수주 계약(단일판매ㆍ공급계약체결) 내역이 존재하지 않습니다.
+                                </p>
+                              </div>
+                            )
+                          ) : (
+                            <div className="w-full p-4.5 bg-surface-container-low border border-outline-variant/30 rounded-lg text-left">
+                              <p className="text-xs font-bold text-secondary flex items-center gap-1.5 mb-2">
+                                <span className="material-symbols-outlined text-sm leading-none">help</span>
+                                일부 건설사 공시 미표시 안내
+                              </p>
+                              <p className="text-xs text-on-surface-variant leading-relaxed mb-2.5">
+                                아래와 같은 비상장 기업들은 주식시장에 상장되어 있지 않아 DART에 수주 관련 주요사항보고서(수시공시)를 직접 제출하지 않으므로 검색 리스트에 나타나지 않을 수 있습니다.
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {Object.keys(UNLISTED_OR_SPECIAL_COMPANIES).map((name, i) => (
+                                  <span key={i} className="text-[11px] bg-white border border-outline-variant/40 px-2 py-0.5 rounded text-primary font-semibold">
+                                    {name}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
