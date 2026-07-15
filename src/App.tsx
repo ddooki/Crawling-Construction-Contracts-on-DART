@@ -58,7 +58,7 @@ export default function App() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [todayApiCallCount, setTodayApiCallCount] = useState<number>(() => {
     try {
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = new Date().toLocaleDateString('sv-SE');
       const saved = localStorage.getItem('dart_api_call_count');
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -76,9 +76,9 @@ export default function App() {
   const [startDate, setStartDate] = useState<string>(() => {
     const d = new Date();
     d.setFullYear(d.getFullYear() - 1);
-    return d.toISOString().split('T')[0];
+    return d.toLocaleDateString('sv-SE');
   });
-  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState<string>(new Date().toLocaleDateString('sv-SE'));
   
   const [isLoading, setIsLoading] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
@@ -123,7 +123,7 @@ export default function App() {
       const newCalls = data.apiCallCount || 0;
       setDisclosures(list);
       
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = new Date().toLocaleDateString('sv-SE');
       let storedTotal = 0;
       try {
         const saved = localStorage.getItem('dart_api_call_count');
